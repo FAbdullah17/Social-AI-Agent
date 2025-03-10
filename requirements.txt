@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-dotenv
+tweepy
+linkedin-api
+instagrapi
+facebook-sdk
+celery
+redis
+torch
+transformers
+accelerate
+diffusers
+safetensors
