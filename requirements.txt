@@ -3,13 +3,8 @@ uvicorn
 python-dotenv
 tweepy
 linkedin-api
-instagrapi
-facebook-sdk
-celery
-redis
-torch
-transformers
-accelerate
+requests
 diffusers
+torch
+accelerate
 safetensors
-ollama
