@@ -1,30 +1,34 @@
-import ollama
-import logging
+import os
+import requests
+from fastapi import APIRouter
+from dotenv import load_dotenv
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+load_dotenv()
 
-def generate_text(prompt: str) -> str:
+router = APIRouter()
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_URL = "https://api.groq.com/v1/chat/completions"  
+
+@router.get("/generate-text")
+def generate_text(prompt: str, max_length: int = 800):
     """
-    Generates text using DeepSeek 7B via Ollama.
-    
-    Args:
-        prompt (str): The input prompt.
-    
-    Returns:
-        str: The generated text.
+    Calls the Groq API to generate text based on the provided prompt using Mistral.
     """
-    try:
-        response = ollama.chat(
-            model="deepseek-r1:7b", 
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response["message"]["content"]
-    except Exception as e:
-        logger.error("Error generating text with Ollama: %s", e)
-        raise
-
-if __name__ == "__main__":
-    prompt = input("Enter your prompt: ")
-    generated_text = generate_text(prompt)
-    print("Generated Text:\n", generated_text)
+    payload = {
+        "model": "mistral-7b",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_length
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    response = requests.post(GROQ_API_URL, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()  
+    else:
+        return {"error": response.text}
