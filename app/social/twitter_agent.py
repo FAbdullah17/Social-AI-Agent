@@ -2,24 +2,33 @@ import os
 import tweepy
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
-CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
-CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
-ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+# Twitter API credentials
+TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
+TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
+TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
-auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth)
+# Authenticate with Twitter API
+auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
 
-def post_tweet(text: str):
+# Create API object
+api = tweepy.API(auth, wait_on_rate_limit=True)
+
+def post_tweet(text):
     """
-    Posts a tweet with the provided text.
+    Posts a tweet with the given text.
     """
-    tweet = api.update_status(status=text)
-    return tweet._json
+    try:
+        tweet = api.update_status(status=text)
+        return f"Tweet posted successfully: {tweet.id}"
+    except tweepy.TweepyException as e:
+        return f"Failed to post tweet: {e}"
 
+# Example usage
 if __name__ == "__main__":
-    sample_text = "This is a sample tweet from the AI Social Media Agent."
+    sample_text = "Hello, this is a test tweet from my AI social media agent!"
     print(post_tweet(sample_text))
