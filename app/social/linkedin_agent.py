@@ -1,22 +1,22 @@
 import os
-from linkedin_api import Linkedin
 from dotenv import load_dotenv
+from linkedin_api import Linkedin
 
 load_dotenv()
 
-# LinkedIn credentials
-LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
-LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
+LI_AT_COOKIE = os.getenv("LI_AT_COOKIE")
+JSESSIONID = os.getenv("JSESSIONID")
 
-api = Linkedin(LINKEDIN_USERNAME, LINKEDIN_PASSWORD)
+api = Linkedin("", "", cookies={"li_at": LI_AT_COOKIE, "JSESSIONID": JSESSIONID})
 
-def post_linkedin(text: str):
-    """
-    Posts a share on LinkedIn with the provided text.
-    """
-    response = api.post_share(comment=text)
-    return response
+def post_linkedin_update(text):
+    """Posts a status update to LinkedIn."""
+    try:
+        response = api.submit_share(text=text)
+        print("Post successful:", response)
+    except Exception as e:
+        print("Failed to post:", e)
 
 if __name__ == "__main__":
-    sample_text = "This is a sample LinkedIn post from the AI Social Media Agent."
-    print(post_linkedin(sample_text))
+    sample_text = "🚀 Automating LinkedIn posts using Python! #AI #Automation"
+    post_linkedin_update(sample_text)
