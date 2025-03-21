@@ -1,22 +1,50 @@
 import os
+import requests
 from dotenv import load_dotenv
-from linkedin_api import Linkedin
 
 load_dotenv()
 
-LI_AT_COOKIE = os.getenv("LI_AT_COOKIE")
-JSESSIONID = os.getenv("JSESSIONID")
+LINKEDIN_ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN")
+LINKEDIN_URN_ID = os.getenv("LINKEDIN_URN_ID")
 
-api = Linkedin("", "", cookies={"li_at": LI_AT_COOKIE, "JSESSIONID": JSESSIONID})
+def post_linkedin_update(post_content):
+    """
+    Posts a status update to LinkedIn using the official UGC Posts API.
+    
+    Args:
+        post_content (str): The text content of the post.
+    
+    Returns:
+        None; prints the result.
+    """
+    api_url = "https://api.linkedin.com/v2/ugcPosts"
+    headers = {
+        "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+        "X-Restli-Protocol-Version": "2.0.0"
+    }
+    payload = {
+        "author": f"urn:li:person:{LINKEDIN_URN_ID}",
+        "lifecycleState": "PUBLISHED",
+        "specificContent": {
+            "com.linkedin.ugc.ShareContent": {
+                "shareCommentary": {"text": post_content},
+                "shareMediaCategory": "NONE"
+            }
+        },
+        "visibility": {
+            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+        }
+    }
+    
+    response = requests.post(api_url, headers=headers, json=payload)
+    
+    if response.status_code == 201:
+        print("Post successful!")
+    else:
+        print(f"Failed to post: {response.status_code} - {response.text}")
 
-def post_linkedin_update(text):
-    """Posts a status update to LinkedIn."""
-    try:
-        response = api.submit_share(text=text)
-        print("Post successful:", response)
-    except Exception as e:
-        print("Failed to post:", e)
-
+# Example usage
 if __name__ == "__main__":
-    sample_text = "🚀 Automating LinkedIn posts using Python! #AI #Automation"
+    sample_text = "🚀 Automating LinkedIn posts using Python and the official LinkedIn API! #AI #Automation"
     post_linkedin_update(sample_text)
